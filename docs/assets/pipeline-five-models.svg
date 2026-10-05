@@ -1,0 +1,144 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1390" viewBox="0 0 1440 1390" role="img" aria-labelledby="title desc">
+<title id="title">From 3D DaT scans to a model-specific ensemble</title>
+<desc id="desc">Resample 3D scans, prepare candidate slices, select the best z with ResNet18, then branch into exactly five representations: RGB, grayscale, z plus or minus 2, 4, and 7 mm. Train one classifier per representation. Merge all model probabilities with a weighted logit ensemble.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#64dac6" stroke-width="1.6"/></marker></defs>
+<rect width="1440" height="1390" rx="24" fill="#101d30"/>
+<g font-family="Arial, Helvetica, sans-serif">
+
+<text x="44" y="48" font-size="17" fill="#64dac6" font-weight="700">3D INPUT → LEARNED SLICE SELECTION → MODEL-SPECIFIC TRAINING → ENSEMBLE</text>
+<text x="44" y="98" font-size="36" fill="#f3f7ff" font-weight="700">One volume. Five models. One ensemble.</text>
+<text x="44" y="135" font-size="21" fill="#b9cbde" font-weight="400">Each classifier learns from its own image representation of the same examination.</text>
+<rect x="44" y="171" width="250" height="194" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="44" y="187" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="64" y="207" font-size="20" fill="#64dac6" font-weight="700">01  /  3D DaT scan</text>
+<text x="64" y="242" font-size="17" fill="#b9cbde" font-weight="400">NIfTI volume</text>
+<text x="64" y="270" font-size="17" fill="#b9cbde" font-weight="400">Single-channel input</text>
+<text x="64" y="298" font-size="17" fill="#b9cbde" font-weight="400">Resample to 1 mm</text>
+<text x="64" y="326" font-size="17" fill="#b9cbde" font-weight="400">isotropic spacing</text>
+<rect x="334" y="171" width="568" height="194" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="334" y="187" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="354" y="207" font-size="20" fill="#64dac6" font-weight="700">02  /  Prepare candidate slices</text>
+<text x="354" y="242" font-size="17" fill="#b9cbde" font-weight="400">Traverse axial slices along z</text>
+<text x="354" y="270" font-size="17" fill="#b9cbde" font-weight="400">Central 50% crop → rotate 90°</text>
+<text x="354" y="298" font-size="17" fill="#b9cbde" font-weight="400">50–99 percentile window → min–max scaling</text>
+<text x="354" y="326" font-size="17" fill="#b9cbde" font-weight="400">Resize each candidate to 128 × 128</text>
+<rect x="942" y="171" width="454" height="194" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="942" y="187" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="962" y="207" font-size="20" fill="#64dac6" font-weight="700">03  /  Select optimal z</text>
+<text x="962" y="242" font-size="17" fill="#b9cbde" font-weight="400">ResNet18 quality-score regressor</text>
+<text x="962" y="270" font-size="17" fill="#b9cbde" font-weight="400">Score every candidate slice</text>
+<text x="962" y="298" font-size="17" fill="#b9cbde" font-weight="400">z* = argmax quality(z)</text>
+<text x="962" y="326" font-size="17" fill="#b9cbde" font-weight="400">Keep the 3D volume for nearby slices</text>
+<path d="M294 268 H326" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M902 268 H934" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M1169 365 V398 H720 V423" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="270" y="430" width="900" height="130" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="270" y="446" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="290" y="466" font-size="20" fill="#64dac6" font-weight="700">04  /  Define a common region of interest</text>
+<text x="290" y="501" font-size="17" fill="#b9cbde" font-weight="400">Find the intensity-based brain center → 200 × 200 crop around selected z*</text>
+<text x="290" y="529" font-size="17" fill="#b9cbde" font-weight="400">Use raw crops for optional uptake features; build each model’s view separately</text>
+<path d="M720 560 V602" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="44" y="597" font-size="18" fill="#64dac6" font-weight="700">05  /  TRANSFORM → TRAIN → PREDICT</text>
+<path d="M171 623 H1267 M720 604 V623" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M171 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="44" y="656" width="254" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="44" y="672" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="64" y="692" font-size="20" fill="#64dac6" font-weight="700">RGB view</text>
+<text x="64" y="727" font-size="17" fill="#b9cbde" font-weight="400">Selected slice at z*</text>
+<text x="64" y="755" font-size="17" fill="#b9cbde" font-weight="400">R: 1–99.5% scaling</text>
+<text x="64" y="783" font-size="17" fill="#b9cbde" font-weight="400">G: CLAHE contrast</text>
+<text x="64" y="811" font-size="17" fill="#b9cbde" font-weight="400">B: median uptake ratio</text>
+<path d="M171 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="44" y="889" width="254" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="44" y="905" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="64" y="925" font-size="20" fill="#64dac6" font-weight="700">1 / RGB model</text>
+<text x="64" y="960" font-size="17" fill="#b9cbde" font-weight="400">Swin backbone</text>
+<text x="64" y="988" font-size="17" fill="#b9cbde" font-weight="400">Own RGB dataset</text>
+<path d="M171 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="44" y="1037" width="254" height="53" rx="12" fill="#203d50"/>
+<text x="65" y="1070" font-size="20" fill="#64dac6" font-weight="700">Prediction p1</text>
+<path d="M171 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M445 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="318" y="656" width="254" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="318" y="672" width="4" height="28" rx="2" fill="#80b7ff"/>
+<text x="338" y="692" font-size="20" fill="#80b7ff" font-weight="700">Grayscale view</text>
+<text x="338" y="727" font-size="17" fill="#b9cbde" font-weight="400">Selected slice at z*</text>
+<text x="338" y="755" font-size="17" fill="#b9cbde" font-weight="400">0.5–99.8% window</text>
+<text x="338" y="783" font-size="17" fill="#b9cbde" font-weight="400">Min–max scaling</text>
+<text x="338" y="811" font-size="17" fill="#b9cbde" font-weight="400">Single intensity view</text>
+<path d="M445 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="318" y="889" width="254" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="318" y="905" width="4" height="28" rx="2" fill="#80b7ff"/>
+<text x="338" y="925" font-size="20" fill="#80b7ff" font-weight="700">2 / Grayscale model</text>
+<text x="338" y="960" font-size="17" fill="#b9cbde" font-weight="400">DenseNet121 backbone</text>
+<text x="338" y="988" font-size="17" fill="#b9cbde" font-weight="400">Own grayscale dataset</text>
+<path d="M445 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="318" y="1037" width="254" height="53" rx="12" fill="#203d50"/>
+<text x="339" y="1070" font-size="20" fill="#80b7ff" font-weight="700">Prediction p2</text>
+<path d="M445 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M719 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="592" y="656" width="254" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="592" y="672" width="4" height="28" rx="2" fill="#c0a2ff"/>
+<text x="612" y="692" font-size="20" fill="#c0a2ff" font-weight="700">2.5D · z ± 2 mm</text>
+<text x="612" y="727" font-size="17" fill="#b9cbde" font-weight="400">Slabs at z*−2, z*, z*+2</text>
+<text x="612" y="755" font-size="17" fill="#b9cbde" font-weight="400">3-slice slab averaging</text>
+<text x="612" y="783" font-size="17" fill="#b9cbde" font-weight="400">Median brightness match</text>
+<text x="612" y="811" font-size="17" fill="#b9cbde" font-weight="400">0.5–99.8% normalization</text>
+<path d="M719 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="592" y="889" width="254" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="592" y="905" width="4" height="28" rx="2" fill="#c0a2ff"/>
+<text x="612" y="925" font-size="20" fill="#c0a2ff" font-weight="700">3 / Z2 model</text>
+<text x="612" y="960" font-size="17" fill="#b9cbde" font-weight="400">Swin + uptake features</text>
+<text x="612" y="988" font-size="17" fill="#b9cbde" font-weight="400">Own Z2 dataset · TTA</text>
+<path d="M719 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="592" y="1037" width="254" height="53" rx="12" fill="#203d50"/>
+<text x="613" y="1070" font-size="20" fill="#c0a2ff" font-weight="700">Prediction p3</text>
+<path d="M719 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M993 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="866" y="656" width="254" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="866" y="672" width="4" height="28" rx="2" fill="#f2c77e"/>
+<text x="886" y="692" font-size="20" fill="#f2c77e" font-weight="700">2.5D · z ± 4 mm</text>
+<text x="886" y="727" font-size="17" fill="#b9cbde" font-weight="400">Slabs at z*−4, z*, z*+4</text>
+<text x="886" y="755" font-size="17" fill="#b9cbde" font-weight="400">3-slice slab averaging</text>
+<text x="886" y="783" font-size="17" fill="#b9cbde" font-weight="400">Median brightness match</text>
+<text x="886" y="811" font-size="17" fill="#b9cbde" font-weight="400">0.5–99.8% normalization</text>
+<path d="M993 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="866" y="889" width="254" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="866" y="905" width="4" height="28" rx="2" fill="#f2c77e"/>
+<text x="886" y="925" font-size="20" fill="#f2c77e" font-weight="700">4 / Z4 model</text>
+<text x="886" y="960" font-size="17" fill="#b9cbde" font-weight="400">SE-ResNeXt26d backbone</text>
+<text x="886" y="988" font-size="17" fill="#b9cbde" font-weight="400">Own Z4 dataset</text>
+<path d="M993 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="866" y="1037" width="254" height="53" rx="12" fill="#203d50"/>
+<text x="887" y="1070" font-size="20" fill="#f2c77e" font-weight="700">Prediction p4</text>
+<path d="M993 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M1267 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1140" y="656" width="254" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="1140" y="672" width="4" height="28" rx="2" fill="#ee9dbc"/>
+<text x="1160" y="692" font-size="20" fill="#ee9dbc" font-weight="700">2.5D · z ± 7 mm</text>
+<text x="1160" y="727" font-size="17" fill="#b9cbde" font-weight="400">Slabs at z*−7, z*, z*+7</text>
+<text x="1160" y="755" font-size="17" fill="#b9cbde" font-weight="400">3-slice slab averaging</text>
+<text x="1160" y="783" font-size="17" fill="#b9cbde" font-weight="400">Median brightness match</text>
+<text x="1160" y="811" font-size="17" fill="#b9cbde" font-weight="400">0.5–99.8% normalization</text>
+<path d="M1267 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1140" y="889" width="254" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="1140" y="905" width="4" height="28" rx="2" fill="#ee9dbc"/>
+<text x="1160" y="925" font-size="20" fill="#ee9dbc" font-weight="700">5 / Z7 model</text>
+<text x="1160" y="960" font-size="17" fill="#b9cbde" font-weight="400">Swin backbone</text>
+<text x="1160" y="988" font-size="17" fill="#b9cbde" font-weight="400">Own Z7 dataset</text>
+<path d="M1267 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1140" y="1037" width="254" height="53" rx="12" fill="#203d50"/>
+<text x="1161" y="1070" font-size="20" fill="#ee9dbc" font-weight="700">Prediction p5</text>
+<path d="M1267 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<text x="44" y="1163" font-size="19" fill="#b9cbde" font-weight="400">Per branch: 224 × 224 · ImageNet normalization</text>
+<text x="830" y="1163" font-size="19" fill="#b9cbde" font-weight="400">Training augmentation · patient-grouped folds</text>
+<path d="M171 1120 H1267" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M720 1120 V1190" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="270" y="1197" width="900" height="145" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="270" y="1213" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="290" y="1233" font-size="20" fill="#64dac6" font-weight="700">06  /  Ensemble of all five models</text>
+<text x="290" y="1268" font-size="17" fill="#b9cbde" font-weight="400">Average fold predictions within each branch → weighted logit ensemble</text>
+<text x="290" y="1296" font-size="17" fill="#b9cbde" font-weight="400">p = sigmoid(Σᵢ₌₁⁵ wᵢ × logit(pᵢ))     •     wᵢ ≥ 0, Σ wᵢ = 1</text>
+<text x="290" y="1324" font-size="17" fill="#b9cbde" font-weight="400">Final output: P(abnormal) per examination → submission CSV</text>
+<text x="44" y="1371" font-size="18" fill="#b9cbde" font-weight="400">Branch-specific transformations are reused at inference; test-time augmentation is enabled per model configuration.</text>
+</g></svg>

@@ -20,7 +20,7 @@ A full 3D scan contains many slices, while the striatal region is especially rel
 
 The pipeline predicts **normal versus abnormal DaT examinations**. Its output is a scan-level probability, not a standalone diagnosis of Parkinson's disease.
 
-![Pipeline architecture](docs/assets/pipeline.svg?v=2)
+![Pipeline architecture](docs/assets/pipeline-five-models.svg)
 
 ## 1. Learn the most informative slice
 
@@ -34,18 +34,19 @@ Slices from the same patient stay together during selector cross-validation.
 
 ## 2. Build complementary image representations
 
-Around the selected z, I create a 200 × 200 crop centered on the intensity-based brain center and compare two representations:
+Around the selected z, I create a 200 × 200 crop centered on the intensity-based brain center and build three types of representation for five separate models:
 
 | Representation | Input channels | Purpose |
 |---|---|---|
 | Multi-contrast RGB | Percentile-normalized intensity, CLAHE, uptake ratio | Combine overall uptake with local contrast |
+| Grayscale | Percentile-normalized intensity of the selected slice | Preserve the original intensity pattern |
 | 2.5D stack | Averaged slabs at z−Δ, z, z+Δ | Retain nearby spatial information in a 2D backbone |
 
 I explored offsets of **2, 4, and 7 mm**. Some branches also use two geometric uptake features: mean uptake relative to a background region and an asymmetry measure. Missing feature values are imputed using training-fold statistics saved with the model.
 
 ## 3. Train classifiers and combine their predictions
 
-I compared CNN and Swin Transformer branches, then combined their probabilities in logit space. The ensemble uses nonnegative weights that sum to one:
+I trained five separate classifiers: **RGB, grayscale, z±2, z±4, and z±7**. Each model receives its own transformed dataset. I then combine all five models’ probabilities in logit space. The ensemble uses nonnegative weights that sum to one:
 
 ```text
 p(ensemble) = sigmoid(Σ weight[i] × logit(p[i]))

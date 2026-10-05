@@ -1,0 +1,12 @@
+{
+  "seed": 42, "n_splits": 5, "pretrained": true,
+  "view": {"mode": "25d", "offset_mm": 4, "crop_size": 200, "resample_mm": 1.0},
+  "model": {"model_name": "seresnext26d_32x4d", "drop_rate": 0.5, "use_sbr": false},
+  "training": {
+    "epochs": 25, "patience": 8, "batch_size": 16,
+    "lr_backbone": 0.0002881687682219976,
+    "lr_head": 0.0012599150132224773,
+    "weight_decay": 0.003246703058697957,
+    "tta": "none"
+  }
+}

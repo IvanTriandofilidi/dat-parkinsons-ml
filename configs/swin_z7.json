@@ -1,0 +1,14 @@
+{
+  "seed": 42,
+  "n_splits": 5,
+  "pretrained": true,
+  "view": {"mode": "25d", "offset_mm": 7, "crop_size": 200, "resample_mm": 1.0},
+  "model": {"model_name": "swin_tiny_patch4_window7_224.ms_in22k_ft_in1k", "drop_rate": 0.5, "use_sbr": true},
+  "training": {
+    "epochs": 25, "patience": 8, "batch_size": 16,
+    "lr_backbone": 0.000056115164153345,
+    "lr_head": 0.007969454818643935,
+    "weight_decay": 0.0015751320499779737,
+    "tta": "hflip"
+  }
+}

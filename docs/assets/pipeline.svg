@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="410" viewBox="0 0 1200 410" role="img" aria-labelledby="title desc">
+  <title id="title">DaT imaging pipeline</title>
+  <desc id="desc">A 3D volume passes through learned slice selection, complementary image views, classifiers, and a logit ensemble. Diagram only, no patient imagery.</desc>
+  <defs>
+    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101c32"/><stop offset="1" stop-color="#172d46"/></linearGradient>
+    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#56d9c5" stroke-width="1.5"/></marker>
+  </defs>
+  <rect width="1200" height="410" rx="22" fill="url(#bg)"/>
+  <g font-family="Arial, Helvetica, sans-serif">
+    <text x="40" y="49" fill="#56d9c5" font-size="13" letter-spacing="3">MEDICAL IMAGING / MACHINE LEARNING</text>
+    <text x="40" y="92" fill="#f3f7ff" font-size="30" font-weight="700">Learn where to look. Combine what each view reveals.</text>
+    <text x="40" y="123" fill="#a7bbd0" font-size="15">A learned z selector connects volumetric input to efficient image classifiers.</text>
+    <g fill="#21394f" stroke="#37536d">
+      <rect x="40" y="161" width="198" height="168" rx="12"/>
+      <rect x="272" y="161" width="198" height="168" rx="12"/>
+      <rect x="504" y="161" width="198" height="168" rx="12"/>
+      <rect x="736" y="161" width="198" height="168" rx="12"/>
+      <rect x="968" y="161" width="192" height="168" rx="12"/>
+    </g>
+    <g stroke="#56d9c5" stroke-width="2" marker-end="url(#arrow)"><path d="M240 244h27"/><path d="M472 244h27"/><path d="M704 244h27"/><path d="M936 244h27"/></g>
+    <g fill="#56d9c5" font-size="12" letter-spacing="2"><text x="58" y="188">01 / INPUT</text><text x="290" y="188">02 / SELECT</text><text x="522" y="188">03 / REPRESENT</text><text x="754" y="188">04 / CLASSIFY</text><text x="986" y="188">05 / COMBINE</text></g>
+    <g fill="#f4f8ff" font-size="19" font-weight="700"><text x="58" y="225">3D DaT scan</text><text x="290" y="225">Best slice z</text><text x="522" y="225">RGB + 2.5D</text><text x="754" y="225">CNN / Swin</text><text x="986" y="225">Logit blend</text></g>
+    <g fill="#b9cadd" font-size="14">
+      <text x="58" y="257">NIfTI volume</text><text x="58" y="280">1 mm resampling</text><text x="58" y="303">Per-case processing</text>
+      <text x="290" y="257">ResNet18 regressor</text><text x="290" y="280">Quality score over z</text><text x="290" y="303">Patient-grouped CV</text>
+      <text x="522" y="257">Intensity / CLAHE / ratio</text><text x="522" y="280">z−Δ, z, z+Δ slabs</text><text x="522" y="303">Shared preprocessing</text>
+      <text x="754" y="257">Complementary branches</text><text x="754" y="280">Optional uptake proxies</text><text x="754" y="303">Persisted fold artifacts</text>
+      <text x="986" y="257">Constrained weights</text><text x="986" y="280">P(abnormal)</text><text x="986" y="303">Submission CSV</text>
+    </g>
+    <text x="40" y="374" fill="#839db7" font-size="13">RESEARCH PROTOTYPE</text><text x="262" y="374" fill="#a7bbd0" font-size="13">Historical notebook results · explicit evaluation limits · synthetic software checks</text>
+  </g>
+</svg>

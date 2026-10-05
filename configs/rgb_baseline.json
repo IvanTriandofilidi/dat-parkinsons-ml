@@ -1,0 +1,6 @@
+{
+  "seed": 42, "n_splits": 5, "pretrained": true,
+  "view": {"mode": "rgb", "offset_mm": 0, "crop_size": 200, "resample_mm": 1.0},
+  "model": {"model_name": "resnet18", "drop_rate": 0.3, "use_sbr": false},
+  "training": {"epochs": 25, "patience": 8, "batch_size": 16, "lr_backbone": 0.0001, "lr_head": 0.001, "weight_decay": 0.001, "tta": "none"}
+}

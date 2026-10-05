@@ -1,0 +1,9 @@
+{
+  "status": "passed_with_rounding_tolerance",
+  "comparisons": 18,
+  "max_uint8_difference": 1,
+  "differing_channel_values": 6,
+  "total_channel_values": 2160000,
+  "scope": "Synthetic arrays compared with reviewed Kaggle cell 15 functions at boundary and middle z, offsets 2/4/7. Differences bounded by one 8-bit intensity step; not bitwise parity. SBR matches within float32 tolerance.",
+  "historical_model_predictions_reproduced": false
+}

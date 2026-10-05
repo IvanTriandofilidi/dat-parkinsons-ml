@@ -1,0 +1,44 @@
+{
+  "source": "Colab saved outputs, cells 30-33 (zero-based)",
+  "retrieved_on": "2026-10-05",
+  "cohort_n": 1362,
+  "recomputed": false,
+  "models": [
+    {
+      "name": "25D_Z4",
+      "log_loss": 0.2644,
+      "roc_auc": 0.9563,
+      "blend_weight_rounded": 0.2611
+    },
+    {
+      "name": "DenseNet121",
+      "log_loss": 0.3177,
+      "roc_auc": 0.9369,
+      "blend_weight_rounded": 0.0
+    },
+    {
+      "name": "Swin_RGB",
+      "log_loss": 0.3293,
+      "roc_auc": 0.9342,
+      "blend_weight_rounded": 0.0606
+    },
+    {
+      "name": "Swin_Z2_SBR_TTA",
+      "log_loss": 0.246,
+      "roc_auc": 0.9602,
+      "blend_weight_rounded": 0.4067
+    },
+    {
+      "name": "Swin_Z7",
+      "log_loss": 0.2547,
+      "roc_auc": 0.9574,
+      "blend_weight_rounded": 0.2716
+    }
+  ],
+  "blend": {
+    "log_loss": 0.2189,
+    "roc_auc": 0.9693,
+    "scope": "weights fitted and evaluated on the same OOF rows"
+  },
+  "data_integrity_note": "Source cell 29 removes 20 duplicate rows by keeping first; upstream fold integrity not established."
+}

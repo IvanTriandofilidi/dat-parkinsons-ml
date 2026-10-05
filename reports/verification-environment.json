@@ -1,0 +1,18 @@
+{
+  "python": "3.12.14",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "packages": {
+    "numpy": "2.5.2",
+    "pandas": "2.3.3",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "opencv-python-headless": "4.14.0.94",
+    "nibabel": "5.4.2",
+    "torchio": "0.23.1",
+    "torch": "2.14.1+cpu",
+    "torchvision": "0.29.1+cpu",
+    "timm": "1.0.30",
+    "pytest": "9.1.1",
+    "ruff": "0.16.10"
+  }
+}

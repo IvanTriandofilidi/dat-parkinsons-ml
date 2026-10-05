@@ -1,0 +1,61 @@
+[
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 1,
+    "source_sha256": "f033a727955a87f18697f8da6f461b1a64486f7aa260039eef03d206e7c8af14"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 15,
+    "source_sha256": "334806247688344202cf28f6e8262c25e2722991d3ee46d6302976903bfed86b"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 19,
+    "source_sha256": "a2787ceec7068b8765cb29b1cbcea7dc8b747d4628f05a520491340274846725"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 25,
+    "source_sha256": "117eccd80f24a4c76d312cc8f325dc6e4068876269a4b2831b742cc54241ec79"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 26,
+    "source_sha256": "5d000a8304d50b2881b8deedb7e68ee5888df3075bc247fb5b7dbc2798abb394"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 35,
+    "source_sha256": "886536aa3f8d3a398318b40377c6c44d0fa6ecbfb9dda667bcb6d210c8e5a26a"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 41,
+    "source_sha256": "42d4d514a32beba1165170a3feca0858aad5af648ffd589afbd2542de61b66f0"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 43,
+    "source_sha256": "c946dab52ee0b09f02a9f56880c2c51b94f2598c64ff40e346be2c50301247c3"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 57,
+    "source_sha256": "5f6c572fe18a8529c5f6235e864fb963a6a675ac7cce4cc2b01574968fb47d64"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 64,
+    "source_sha256": "f033a727955a87f18697f8da6f461b1a64486f7aa260039eef03d206e7c8af14"
+  },
+  {
+    "source": "kaggle",
+    "cell_index_zero_based": 66,
+    "source_sha256": "37141b2967baa82fb210a13bd3f145ec5fd275a9ea59fe185de4027761bb28e7"
+  },
+  {
+    "source": "colab_python_export",
+    "source_sha256": "fcf34081274d1a62a2828cdeb42d00438e54e54ea45e28be67412c0d47f0dc10"
+  }
+]

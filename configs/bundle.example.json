@@ -1,0 +1,9 @@
+{
+  "scorer": "../artifacts/selector/selector.pt",
+  "model_order": ["seresnext_z4", "swin_z7"],
+  "weights": [0.5, 0.5],
+  "branches": [
+    {"name": "seresnext_z4", "checkpoints": ["../runs/seresnext_z4/fold_0.pt", "../runs/seresnext_z4/fold_1.pt", "../runs/seresnext_z4/fold_2.pt", "../runs/seresnext_z4/fold_3.pt", "../runs/seresnext_z4/fold_4.pt"]},
+    {"name": "swin_z7", "checkpoints": ["../runs/swin_z7/fold_0.pt", "../runs/swin_z7/fold_1.pt", "../runs/swin_z7/fold_2.pt", "../runs/swin_z7/fold_3.pt", "../runs/swin_z7/fold_4.pt"]}
+  ]
+}

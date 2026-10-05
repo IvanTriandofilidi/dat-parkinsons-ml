@@ -2,7 +2,7 @@
 
 ## Access and redistribution
 
-The original challenge data license restricts sharing, third-party uploads, and use outside the competition. This repository contains code and aggregate historical metrics only. It does not contain NIfTI scans, patient images, annotations, patient-level OOF predictions, or trained competition weights. Continued use requires a separate applicable permission or license. Do not infer permission from the continued existence of a Kaggle dataset or a local archive.
+The original challenge data license restricts sharing, third-party uploads, and use outside the competition. The repository does not distribute the training dataset, NIfTI volumes, annotations, patient-level OOF predictions, or trained competition weights. Two separately supplied reference illustrations appear in the README; they are not model outputs or a downloadable training dataset. Continued data use requires a separate applicable permission or license. Do not infer permission from the continued existence of a hosted dataset or a local archive.
 
 ## Volume and pathology labels
 

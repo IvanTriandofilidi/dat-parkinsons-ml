@@ -1,5 +1,5 @@
 include LICENSE README.md
 recursive-include configs *.json
-recursive-include docs *.md *.svg
+recursive-include docs *.md *.svg *.png
 recursive-include reports *.json *.md *.txt
 recursive-include notebooks *.ipynb

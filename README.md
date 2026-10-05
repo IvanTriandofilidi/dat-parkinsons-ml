@@ -1,47 +1,87 @@
 # DaT Parkinson's — learned slice selection & multi-view ensembles
 
-**From 3D DaT scans to a probability of abnormality, through a learned axial-slice selector and complementary 2D / 2.5D views.**
+**A two-stage approach to DaT scan classification: learn where to look, then combine complementary views.**
 
 [![CI](https://github.com/IvanTriandofilidi/dat-parkinsons-ml/actions/workflows/ci.yml/badge.svg)](https://github.com/IvanTriandofilidi/dat-parkinsons-ml/actions/workflows/ci.yml)
 ![Python](https://img.shields.io/badge/Python-3.11%2B-3776AB?logo=python&logoColor=white)
 ![PyTorch](https://img.shields.io/badge/PyTorch-EE4C2C?logo=pytorch&logoColor=white)
-![Research](https://img.shields.io/badge/status-research%20prototype-64748B)
+
+I built this project for the [DrivenData DaT Parkinson's Challenge](https://www.drivendata.org/competitions/311/dat-parkinsons-challenge/). My goal was to turn a 3D dopamine transporter scan into a probability that the examination is abnormal, using a learned slice selector and an ensemble of image classifiers.
+
+<p align="center">
+  <img src="docs/assets/dat-uptake-patterns.png" width="520" alt="Side-by-side examples of different dopamine transporter uptake patterns" />
+</p>
+
+*Different DaT uptake patterns illustrate the image-classification task. This is a reference illustration, not a prediction produced by the model. The SFMN credit is retained in the image.*
+
+## Why I used a two-stage pipeline
+
+A full 3D scan contains many slices, while the striatal region is especially relevant to this task. I separated the problem into two parts: finding an informative axial slice and classifying the selected region. This lets me use pretrained 2D backbones while retaining nearby spatial information through 2.5D inputs.
+
+The pipeline predicts **normal versus abnormal DaT examinations**. Its output is a scan-level probability, not a standalone diagnosis of Parkinson's disease.
 
 ![Pipeline architecture](docs/assets/pipeline.svg)
 
-An engineering refactor of my solution for the [DrivenData DaT Parkinson's Challenge](https://www.drivendata.org/competitions/311/dat-parkinsons-challenge/). The competition task is to classify DaT examinations as **normal or abnormal**, not to diagnose Parkinson's disease directly. The primary metric is **log loss**; AUROC is a secondary reference metric.
+## 1. Learn the most informative slice
 
-The original work was developed across [Kaggle](https://www.kaggle.com/code/ivantriandofilidi/dat-parkinson) and [Colab](https://colab.research.google.com/drive/1qCBlGvt3ugkqL6cME0UFm_c7xQ_9ExmG). This repository turns those experiments into an importable package with explicit input contracts, reproducible entry points, and documented evaluation limits.
+I trained a one-channel ResNet18 to predict manually assigned slice-quality scores. Each volume is resampled to 1 mm spacing, and each candidate slice is cropped, percentile-normalized, and resized to 128 × 128. The slice with the highest score becomes the reference position, **z**.
 
-## The approach
+Slices from the same patient stay together during selector cross-validation.
 
-1. **Learn where to look.** A one-channel ResNet18 regresses manually assigned slice-quality scores. Score the central crop of each axial array slice after 1 mm resampling; select the highest-scoring z. Selector validation groups slices by patient.
-2. **Preserve complementary information.** A 200 × 200 crop around the intensity-based brain center becomes either a synthetic RGB view (percentile intensity / CLAHE / uptake ratio) or a 2.5D view with three averaged slabs at z−Δ, z, z+Δ. The notebook experiments used Δ = 2, 4, and 7 mm.
-3. **Train diverse classifiers.** CNN and Swin branches use image features and, optionally, two geometric uptake proxies. Each fold learns its own missing-feature imputation values.
-4. **Combine probabilities in logit space.** Nonnegative weights sum to one. The selected blend is applied to new examinations without fitting statistics on the test batch.
+![Axial slices sampled from a 3D DaT volume](docs/assets/axial-slice-selection.png)
 
-The source notebooks explored several variants. The package provides a shared implementation for RGB, grayscale, and configurable 2.5D views; example training configurations capture the observed SE-ResNeXt Z4 and Swin Z7 experiments. The RGB baseline is a new comparison configuration. These are **refactored experiment configurations**, not a claim that all original checkpoints have been reproduced.
+*A 3D volume viewed as a sequence of 2D axial slices. The uptake pattern changes with z; the selector searches for an informative view of the striatal region within the basal ganglia. The montage illustrates the selection problem and does not mark a model-selected winner.*
 
-## Results and their scope
+## 2. Build complementary image representations
 
-The following values were transcribed from the saved Colab outputs on a 1,362-patient aligned OOF cohort. They have **not** been recomputed by this refactor.
+Around the selected z, I create a 200 × 200 crop centered on the intensity-based brain center and compare two representations:
 
-| Original experiment | Log loss ↓ | AUROC ↑ |
+| Representation | Input channels | Purpose |
+|---|---|---|
+| Multi-contrast RGB | Percentile-normalized intensity, CLAHE, uptake ratio | Combine overall uptake with local contrast |
+| 2.5D stack | Averaged slabs at z−Δ, z, z+Δ | Retain nearby spatial information in a 2D backbone |
+
+I explored offsets of **2, 4, and 7 mm**. Some branches also use two geometric uptake features: mean uptake relative to a background region and an asymmetry measure. Missing feature values are imputed using training-fold statistics saved with the model.
+
+## 3. Train classifiers and combine their predictions
+
+I compared CNN and Swin Transformer branches, then combined their probabilities in logit space. The ensemble uses nonnegative weights that sum to one:
+
+```text
+p(ensemble) = sigmoid(Σ weight[i] × logit(p[i]))
+```
+
+The package supports configurable image views, optional uptake features, shared patient folds, and fold-model averaging at inference. The example configurations cover SE-ResNeXt Z4, Swin Z7, and an RGB baseline.
+
+## Experimental results
+
+The comparison below uses recorded OOF predictions for **1,362 examinations**. Ensemble weights were optimized on these same predictions. The values come from the original experiments; full training has not been rerun with the packaged implementation.
+
+| Model / representation | Log loss ↓ | AUROC ↑ |
 |---|---:|---:|
 | 2.5D Z4 | 0.2644 | 0.9563 |
 | DenseNet121 | 0.3177 | 0.9369 |
 | Swin RGB | 0.3293 | 0.9342 |
 | Swin Z2 + SBR + TTA | 0.2460 | 0.9602 |
 | Swin Z7 | 0.2547 | 0.9574 |
-| Five-branch logit blend, **weight-fitting score** | **0.2189** | **0.9693** |
+| **Five-model logit ensemble** | **0.2189** | **0.9693** |
 
-The blend weights were optimized on the same OOF rows used to calculate its score. **0.2189 is a fitting result, not an independent test score or a leaderboard score.** The notebook also removed 20 duplicate rows from one prediction table; their upstream origin and effect on fold integrity remain unresolved. See [evaluation and limitations](docs/evaluation.md) before interpreting these numbers.
+Log loss is the primary competition metric. I track AUROC alongside it to compare ranking performance. Details of the evaluation protocol are in [the evaluation notes](docs/evaluation.md).
 
-No competition rank, private leaderboard score, clinical effectiveness, or exact reproduction is claimed.
+## Engineering implementation
 
-## Run without competition data
+I organized the project around a shared preprocessing and inference path, explicit experiment configurations, and self-describing checkpoints.
 
-Use Python 3.11 or newer. A CPU-only installation is enough for tests and the synthetic integration demo:
+- **Shared preprocessing:** the same image construction, quantization, and normalization for training preparation and inference.
+- **Patient-level validation:** shared fold manifests and strict alignment of prediction tables by patient ID.
+- **Complete checkpoint metadata:** architecture, image view, training-fold imputation values, TTA policy, seed, and selector hash.
+- **Independent examination processing:** inference uses each scan and saved training artifacts without estimating statistics from the test batch.
+- **Portable execution:** Python package, CLI commands, CPU support, and relative paths.
+- **Automated checks:** numerical and data-contract tests, short synthetic training runs, and an end-to-end inference demo in GitHub Actions.
+
+## Quick start
+
+Use Python 3.11 or newer. The CPU installation is sufficient for the tests and synthetic demo:
 
 ```bash
 python -m venv .venv
@@ -53,67 +93,52 @@ pytest -q
 dat-parkinsons demo --output runs/demo
 ```
 
-The demo writes a synthetic NIfTI volume, initializes random model weights, loads a complete inference bundle, and writes a valid `uid,is_pathologic` submission twice to check determinism. **Its prediction has no diagnostic meaning.** It downloads no pretrained weights and uses no patient data. Choose a new output directory for each run.
+The demo generates a synthetic NIfTI volume, loads randomly initialized models, and writes a submission twice to check repeatability. It tests the software path; its prediction has no diagnostic meaning. Use a new output directory for each run.
 
-For GPU training, install a compatible CUDA build of PyTorch using the [official installer](https://pytorch.org/get-started/locally/) before installing the package.
+For GPU training, install a compatible CUDA build using the [PyTorch installer](https://pytorch.org/get-started/locally/).
 
-## Train and predict
+## Training and inference
 
-Training requires locally held data and annotations that you are authorized to use. The repository distributes neither. See [the data contract](docs/data.md) and [the full reproduction guide](docs/reproduction.md).
+The pipeline is split into explicit stages:
+
+```text
+train-selector → prepare → folds → train-classifier → fit-blend → predict
+```
+
+For example, to prepare and train the Swin Z7 branch with a trained selector:
 
 ```bash
-# 1. Evaluate the slice scorer using patient-grouped CV.
-dat-parkinsons train-selector --labels data/slice_labels/z_slice_labels.csv --output runs/selector_cv --device cuda
-
-# 2. Refit for a fixed number of epochs chosen from training-side experiments.
-dat-parkinsons train-selector --labels data/slice_labels/z_slice_labels.csv --output artifacts/selector --epochs 50 --final --device cuda
-
-# 3. Prepare a chosen classifier view with the same selector used at inference.
 dat-parkinsons prepare --nifti-dir data/niftis --labels data/train_labels.csv --scorer artifacts/selector/selector.pt --config configs/swin_z7.json --output data/prepared_z7 --device cuda
 
-# 4. Create shared patient folds and train a classifier branch.
 dat-parkinsons folds --manifest data/prepared_z7/manifest.csv --output artifacts/folds.csv
+
 dat-parkinsons train-classifier --manifest data/prepared_z7/manifest.csv --folds artifacts/folds.csv --config configs/swin_z7.json --output runs/swin_z7 --device cuda
+```
 
-# 5. Fit a blend after generating all listed branch OOF files.
-dat-parkinsons fit-blend --tables configs/prediction_tables.example.json --output artifacts/blend.json
+After training the required branches and assembling an inference bundle:
 
-# 6. Assemble a bundle with the fitted model_order / weights and matching checkpoints.
+```bash
 dat-parkinsons predict --bundle configs/bundle.example.json --nifti-dir data/test_niftis --output runs/submission.csv --device cuda
 ```
 
-The two-branch bundle is a schema example with **equal placeholder weights**. Train both branches, inspect their validation behavior, and replace its weights with your saved blend artifact before using it as a fitted ensemble. The reproduction guide includes the second branch commands and explains checkpoint provenance.
+The output has two columns: `uid,is_pathologic`. The example bundle contains equal placeholder weights; replace them with the saved blend weights and matching model checkpoints. Follow the [reproduction guide](docs/reproduction.md) for selector training, the second branch, and ensemble setup.
 
-## Engineering decisions
-
-| Concern | Implementation |
-|---|---|
-| Notebook execution order | Separate modules; no training or file discovery on import |
-| Duplicate examinations | Reject duplicate IDs before folds, joins, or prediction |
-| Silent patient loss in ensemble merges | Require identical ID sets, labels, and available fold assignments |
-| Training / serving differences | One view builder; identical PNG quantization and normalization |
-| Missing uptake features | Persist training-fold medians; never infer them from a test batch |
-| Model artifact ambiguity | Store architecture, preprocessing, TTA policy, seed, and scorer hash |
-| Unexpected pretrained downloads | Inference always constructs models with `pretrained=False` |
-| Evaluation overstatement | Separate blend fitting from disjoint-patient evaluation |
-| Portability | Relative paths, CPU support, Python package, CLI, synthetic CI |
-
-## Repository map
+## Project structure
 
 ```text
 src/dat_parkinsons/   preprocessing, models, training, ensemble, inference, CLI
-configs/             explicit experiment and inference-bundle examples
-notebooks/           ordered, output-free walkthrough
-tests/               numerical, identity, fold, and evaluation-contract tests
-docs/                reproduction, evaluation audit, data contract, model card
-reports/             historical aggregate results and verification record
-.github/workflows/   CPU tests, synthetic inference, and package build
+configs/             experiment configurations and inference-bundle examples
+notebooks/           ordered pipeline walkthrough
+tests/               numerical, data-contract, and training tests
+docs/                method, reproduction guide, evaluation notes, model card
+reports/             recorded results and software verification
+.github/workflows/   automated CPU checks and package build
 ```
 
-Start with [the walkthrough](notebooks/01_pipeline_walkthrough.ipynb), [source-to-package mapping](docs/source-map.md), or [the model card](docs/model-card.md).
+Explore the [walkthrough](notebooks/01_pipeline_walkthrough.ipynb), [data contract](docs/data.md), [model card](docs/model-card.md), or [verification report](reports/verification.md).
 
-## Data and intended use
+## Data and use
 
-Research and portfolio use only. No clinical validation or deployment approval is claimed. The challenge's published rules restrict data use and redistribution; the original competition permission does not establish permission for post-competition reuse. Obtain an applicable license before training or redistributing derived artifacts. Tests and illustrations in this repository use synthetic data only. See the [official competition rules](https://www.drivendata.org/competitions/311/dat-parkinsons-challenge/) and [data contract](docs/data.md).
+This is a research project. Training requires appropriately licensed data and slice-quality annotations; the training dataset and trained competition weights are not distributed here. The README includes two supplied reference illustrations; automated tests use synthetic data. Clinical use would require separate validation.
 
-Code is released under the [MIT License](LICENSE). Third-party pretrained weights and datasets retain their own licenses.
+Code is available under the [MIT License](LICENSE). Third-party images, pretrained weights, and datasets retain their respective rights and licenses.

@@ -37,4 +37,4 @@ The original challenge describes a multicenter French dataset. Repository histor
 
 ## Data governance and licenses
 
-No competition images, patient-level predictions, labels, or trained competition checkpoints are included. Post-competition training requires appropriate data rights. Source code uses MIT; third-party weights and data have separate terms.
+The training dataset, patient-level predictions, labels, and trained competition checkpoints are not distributed. The README includes two separately supplied reference illustrations, not model predictions. Post-competition training requires appropriate data rights. Source code uses MIT; third-party images, weights, and data have separate terms.

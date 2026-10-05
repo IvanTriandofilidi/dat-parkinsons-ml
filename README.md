@@ -20,7 +20,7 @@ A full 3D scan contains many slices, while the striatal region is especially rel
 
 The pipeline predicts **normal versus abnormal DaT examinations**. Its output is a scan-level probability, not a standalone diagnosis of Parkinson's disease.
 
-![Pipeline architecture](docs/assets/pipeline.svg)
+![Pipeline architecture](docs/assets/pipeline.svg?v=2)
 
 ## 1. Learn the most informative slice
 

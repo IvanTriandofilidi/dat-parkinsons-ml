@@ -1,32 +1,126 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="410" viewBox="0 0 1200 410" role="img" aria-labelledby="title desc">
-  <title id="title">DaT imaging pipeline</title>
-  <desc id="desc">A 3D volume passes through learned slice selection, complementary image views, classifiers, and a logit ensemble. Diagram only, no patient imagery.</desc>
-  <defs>
-    <linearGradient id="bg" x2="1" y2="1"><stop stop-color="#101c32"/><stop offset="1" stop-color="#172d46"/></linearGradient>
-    <marker id="arrow" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0 0L6 3L0 6" fill="none" stroke="#56d9c5" stroke-width="1.5"/></marker>
-  </defs>
-  <rect width="1200" height="410" rx="22" fill="url(#bg)"/>
-  <g font-family="Arial, Helvetica, sans-serif">
-    <text x="40" y="49" fill="#56d9c5" font-size="13" letter-spacing="3">MEDICAL IMAGING / MACHINE LEARNING</text>
-    <text x="40" y="92" fill="#f3f7ff" font-size="30" font-weight="700">Learn where to look. Combine what each view reveals.</text>
-    <text x="40" y="123" fill="#a7bbd0" font-size="15">A learned z selector connects volumetric input to efficient image classifiers.</text>
-    <g fill="#21394f" stroke="#37536d">
-      <rect x="40" y="161" width="198" height="168" rx="12"/>
-      <rect x="272" y="161" width="198" height="168" rx="12"/>
-      <rect x="504" y="161" width="198" height="168" rx="12"/>
-      <rect x="736" y="161" width="198" height="168" rx="12"/>
-      <rect x="968" y="161" width="192" height="168" rx="12"/>
-    </g>
-    <g stroke="#56d9c5" stroke-width="2" marker-end="url(#arrow)"><path d="M240 244h27"/><path d="M472 244h27"/><path d="M704 244h27"/><path d="M936 244h27"/></g>
-    <g fill="#56d9c5" font-size="12" letter-spacing="2"><text x="58" y="188">01 / INPUT</text><text x="290" y="188">02 / SELECT</text><text x="522" y="188">03 / REPRESENT</text><text x="754" y="188">04 / CLASSIFY</text><text x="986" y="188">05 / COMBINE</text></g>
-    <g fill="#f4f8ff" font-size="19" font-weight="700"><text x="58" y="225">3D DaT scan</text><text x="290" y="225">Best slice z</text><text x="522" y="225">RGB + 2.5D</text><text x="754" y="225">CNN / Swin</text><text x="986" y="225">Logit blend</text></g>
-    <g fill="#b9cadd" font-size="14">
-      <text x="58" y="257">NIfTI volume</text><text x="58" y="280">1 mm resampling</text><text x="58" y="303">Per-case processing</text>
-      <text x="290" y="257">ResNet18 regressor</text><text x="290" y="280">Quality score over z</text><text x="290" y="303">Patient-grouped CV</text>
-      <text x="522" y="257">Intensity / CLAHE / ratio</text><text x="522" y="280">z−Δ, z, z+Δ slabs</text><text x="522" y="303">Shared preprocessing</text>
-      <text x="754" y="257">Complementary branches</text><text x="754" y="280">Optional uptake proxies</text><text x="754" y="303">Persisted fold artifacts</text>
-      <text x="986" y="257">Constrained weights</text><text x="986" y="280">P(abnormal)</text><text x="986" y="303">Submission CSV</text>
-    </g>
-    <text x="40" y="374" fill="#839db7" font-size="13">RESEARCH PROTOTYPE</text><text x="262" y="374" fill="#a7bbd0" font-size="13">Historical notebook results · explicit evaluation limits · synthetic software checks</text>
-  </g>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1390" viewBox="0 0 1440 1390" role="img" aria-labelledby="title desc">
+<title id="title">From 3D DaT scans to a model-specific ensemble</title>
+<desc id="desc">Resample 3D scans, prepare candidate slices, select the best z with ResNet18, then branch into separate image transformations and training for each classifier. Merge all model probabilities with a weighted logit ensemble.</desc>
+<defs><marker id="arrow" markerWidth="9" markerHeight="9" refX="7" refY="4" orient="auto"><path d="M1 1 L7 4 L1 7" fill="none" stroke="#64dac6" stroke-width="1.6"/></marker></defs>
+<rect width="1440" height="1390" rx="24" fill="#101d30"/>
+<g font-family="Arial, Helvetica, sans-serif">
+
+<text x="44" y="48" font-size="17" fill="#64dac6" font-weight="700">3D INPUT → LEARNED SLICE SELECTION → MODEL-SPECIFIC TRAINING → ENSEMBLE</text>
+<text x="44" y="98" font-size="36" fill="#f3f7ff" font-weight="700">One volume. Different views. One final prediction.</text>
+<text x="44" y="135" font-size="21" fill="#b9cbde" font-weight="400">Each classifier learns from its own image representation of the same examination.</text>
+<rect x="44" y="171" width="250" height="194" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="44" y="187" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="64" y="207" font-size="22" fill="#64dac6" font-weight="700">01  /  3D DaT scan</text>
+<text x="64" y="242" font-size="19" fill="#b9cbde" font-weight="400">NIfTI volume</text>
+<text x="64" y="270" font-size="19" fill="#b9cbde" font-weight="400">Single-channel input</text>
+<text x="64" y="298" font-size="19" fill="#b9cbde" font-weight="400">Resample to 1 mm</text>
+<text x="64" y="326" font-size="19" fill="#b9cbde" font-weight="400">isotropic spacing</text>
+<rect x="334" y="171" width="568" height="194" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="334" y="187" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="354" y="207" font-size="22" fill="#64dac6" font-weight="700">02  /  Prepare candidate slices</text>
+<text x="354" y="242" font-size="19" fill="#b9cbde" font-weight="400">Traverse axial slices along z</text>
+<text x="354" y="270" font-size="19" fill="#b9cbde" font-weight="400">Central 50% crop → rotate 90°</text>
+<text x="354" y="298" font-size="19" fill="#b9cbde" font-weight="400">50–99 percentile window → min–max scaling</text>
+<text x="354" y="326" font-size="19" fill="#b9cbde" font-weight="400">Resize each candidate to 128 × 128</text>
+<rect x="942" y="171" width="454" height="194" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="942" y="187" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="962" y="207" font-size="22" fill="#64dac6" font-weight="700">03  /  Select optimal z</text>
+<text x="962" y="242" font-size="19" fill="#b9cbde" font-weight="400">ResNet18 quality-score regressor</text>
+<text x="962" y="270" font-size="19" fill="#b9cbde" font-weight="400">Score every candidate slice</text>
+<text x="962" y="298" font-size="19" fill="#b9cbde" font-weight="400">z* = argmax quality(z)</text>
+<text x="962" y="326" font-size="19" fill="#b9cbde" font-weight="400">Keep the 3D volume for nearby slices</text>
+<path d="M294 268 H326" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M902 268 H934" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<path d="M1169 365 V398 H720 V423" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="270" y="430" width="900" height="130" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="270" y="446" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="290" y="466" font-size="22" fill="#64dac6" font-weight="700">04  /  Define a common region of interest</text>
+<text x="290" y="501" font-size="19" fill="#b9cbde" font-weight="400">Find the intensity-based brain center → 200 × 200 crop around selected z*</text>
+<text x="290" y="529" font-size="19" fill="#b9cbde" font-weight="400">Use raw crops for optional uptake features; build each model’s view separately</text>
+<path d="M720 560 V602" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<text x="44" y="597" font-size="18" fill="#64dac6" font-weight="700">05  /  TRANSFORM → TRAIN → PREDICT</text>
+<path d="M206 623 H1234 M720 604 V623" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M202.5 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="44" y="656" width="317" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="44" y="672" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="64" y="692" font-size="22" fill="#64dac6" font-weight="700">Multi-contrast RGB</text>
+<text x="64" y="727" font-size="19" fill="#b9cbde" font-weight="400">Selected slice at z*</text>
+<text x="64" y="755" font-size="19" fill="#b9cbde" font-weight="400">R: 1–99.5% normalization</text>
+<text x="64" y="783" font-size="19" fill="#b9cbde" font-weight="400">G: CLAHE local contrast</text>
+<text x="64" y="811" font-size="19" fill="#b9cbde" font-weight="400">B: median uptake ratio</text>
+<path d="M202.5 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="44" y="889" width="317" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="44" y="905" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="64" y="925" font-size="22" fill="#64dac6" font-weight="700">Train RGB classifier</text>
+<text x="64" y="960" font-size="19" fill="#b9cbde" font-weight="400">CNN / Swin backbone</text>
+<text x="64" y="988" font-size="19" fill="#b9cbde" font-weight="400">Own RGB training images</text>
+<path d="M202.5 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="44" y="1037" width="317" height="53" rx="12" fill="#203d50"/>
+<text x="65" y="1070" font-size="21" fill="#64dac6" font-weight="700">Model probabilities  pᵢ</text>
+<path d="M202.5 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M547.5 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="389" y="656" width="317" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="389" y="672" width="4" height="28" rx="2" fill="#80b7ff"/>
+<text x="409" y="692" font-size="22" fill="#80b7ff" font-weight="700">2.5D view · Δ = 4 mm</text>
+<text x="409" y="727" font-size="19" fill="#b9cbde" font-weight="400">Slabs at z*−4, z*, z*+4</text>
+<text x="409" y="755" font-size="19" fill="#b9cbde" font-weight="400">Average 3 slices per slab</text>
+<text x="409" y="783" font-size="19" fill="#b9cbde" font-weight="400">Match median brightness</text>
+<text x="409" y="811" font-size="19" fill="#b9cbde" font-weight="400">Normalize: 0.5–99.8%</text>
+<path d="M547.5 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="389" y="889" width="317" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="389" y="905" width="4" height="28" rx="2" fill="#80b7ff"/>
+<text x="409" y="925" font-size="22" fill="#80b7ff" font-weight="700">Train SE-ResNeXt</text>
+<text x="409" y="960" font-size="19" fill="#b9cbde" font-weight="400">SE-ResNeXt26d backbone</text>
+<text x="409" y="988" font-size="19" fill="#b9cbde" font-weight="400">Own Z4 training images</text>
+<path d="M547.5 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="389" y="1037" width="317" height="53" rx="12" fill="#203d50"/>
+<text x="410" y="1070" font-size="21" fill="#80b7ff" font-weight="700">Model probabilities  pᵢ</text>
+<path d="M547.5 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M892.5 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="734" y="656" width="317" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="734" y="672" width="4" height="28" rx="2" fill="#c0a2ff"/>
+<text x="754" y="692" font-size="22" fill="#c0a2ff" font-weight="700">2.5D view · Δ = 7 mm</text>
+<text x="754" y="727" font-size="19" fill="#b9cbde" font-weight="400">Slabs at z*−7, z*, z*+7</text>
+<text x="754" y="755" font-size="19" fill="#b9cbde" font-weight="400">Average 3 slices per slab</text>
+<text x="754" y="783" font-size="19" fill="#b9cbde" font-weight="400">Match median brightness</text>
+<text x="754" y="811" font-size="19" fill="#b9cbde" font-weight="400">Normalize: 0.5–99.8%</text>
+<path d="M892.5 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="734" y="889" width="317" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="734" y="905" width="4" height="28" rx="2" fill="#c0a2ff"/>
+<text x="754" y="925" font-size="22" fill="#c0a2ff" font-weight="700">Train Swin</text>
+<text x="754" y="960" font-size="19" fill="#b9cbde" font-weight="400">Swin Tiny backbone</text>
+<text x="754" y="988" font-size="19" fill="#b9cbde" font-weight="400">Own Z7 training images</text>
+<path d="M892.5 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="734" y="1037" width="317" height="53" rx="12" fill="#203d50"/>
+<text x="755" y="1070" font-size="21" fill="#c0a2ff" font-weight="700">Model probabilities  pᵢ</text>
+<path d="M892.5 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M1237.5 623 V649" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1079" y="656" width="317" height="198" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="1079" y="672" width="4" height="28" rx="2" fill="#f2c77e"/>
+<text x="1099" y="692" font-size="22" fill="#f2c77e" font-weight="700">Additional model views</text>
+<text x="1099" y="727" font-size="19" fill="#b9cbde" font-weight="400">Repeat for each variant</text>
+<text x="1099" y="755" font-size="19" fill="#b9cbde" font-weight="400">2.5D Δ = 2 mm / grayscale</text>
+<text x="1099" y="783" font-size="19" fill="#b9cbde" font-weight="400">Apply its view parameters</text>
+<text x="1099" y="811" font-size="19" fill="#b9cbde" font-weight="400">Optional uptake features</text>
+<path d="M1237.5 854 V882" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1079" y="889" width="317" height="114" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="1079" y="905" width="4" height="28" rx="2" fill="#f2c77e"/>
+<text x="1099" y="925" font-size="22" fill="#f2c77e" font-weight="700">Train each extra model</text>
+<text x="1099" y="960" font-size="19" fill="#b9cbde" font-weight="400">Separate model + dataset</text>
+<text x="1099" y="988" font-size="19" fill="#b9cbde" font-weight="400">Own view configuration</text>
+<path d="M1237.5 1003 V1030" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="1079" y="1037" width="317" height="53" rx="12" fill="#203d50"/>
+<text x="1100" y="1070" font-size="21" fill="#f2c77e" font-weight="700">Model probabilities  pᵢ</text>
+<path d="M1237.5 1090 V1120" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<text x="44" y="1163" font-size="19" fill="#b9cbde" font-weight="400">Per branch: 224 × 224 · ImageNet normalization</text>
+<text x="830" y="1163" font-size="19" fill="#b9cbde" font-weight="400">Training augmentation · patient-grouped folds</text>
+<path d="M202.5 1120 H1237.5" fill="none" stroke="#64dac6" stroke-width="2.5"/>
+<path d="M720 1120 V1190" fill="none" stroke="#64dac6" stroke-width="2.5" marker-end="url(#arrow)"/>
+<rect x="270" y="1197" width="900" height="145" rx="14" fill="#1b3046" stroke="#35516b"/>
+<rect x="270" y="1213" width="4" height="28" rx="2" fill="#64dac6"/>
+<text x="290" y="1233" font-size="22" fill="#64dac6" font-weight="700">06  /  Combine all model predictions</text>
+<text x="290" y="1268" font-size="19" fill="#b9cbde" font-weight="400">Average fold predictions within each branch → weighted logit ensemble</text>
+<text x="290" y="1296" font-size="19" fill="#b9cbde" font-weight="400">p = sigmoid(Σ wᵢ × logit(pᵢ))     •     wᵢ ≥ 0, Σ wᵢ = 1</text>
+<text x="290" y="1324" font-size="19" fill="#b9cbde" font-weight="400">Final output: P(abnormal) per examination → submission CSV</text>
+<text x="44" y="1371" font-size="18" fill="#b9cbde" font-weight="400">Branch-specific transformations are reused at inference; test-time augmentation is enabled per model configuration.</text>
+</g></svg>
